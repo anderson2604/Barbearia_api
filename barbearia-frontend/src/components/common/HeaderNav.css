@@ -1,0 +1,61 @@
+.header-nav-container {
+  display: flex;
+  justify-content: space-between; /* Alinha a esquerda e a direita */
+  align-items: center;
+  padding: 15px 50px;
+  background-color: transparent; /* Fundo transparente para se misturar ao site */
+  width: 100%;
+  position: absolute; /* Para ficar no topo, sem ocupar espaço no fluxo da página */
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Garante que fique acima de outros elementos */
+}
+
+.nav-links-left, .nav-links-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #f8f8f8;
+  font-weight: bold;
+  font-size: 1em;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #a87b5c; /* Cor de destaque ao passar o mouse */
+}
+
+/* Estilo para o botão de login do barbeiro (discreto) */
+.barbeiro-login-link {
+  font-size: 0.85em; /* Fonte menor */
+  color: #f9f8f8; /* Cor mais suave */
+  font-weight: normal; /* Sem negrito */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: all 0.3s ease;
+}
+
+.barbeiro-login-link:hover {
+  color: #a87b5c;
+  border-color: #a87b5c;
+  background-color: #f8f8f8;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  .header-nav-container {
+    flex-direction: column;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+  
+  .nav-links-left, .nav-links-right {
+    flex-direction: row;
+    gap: 15px;
+  }
+}

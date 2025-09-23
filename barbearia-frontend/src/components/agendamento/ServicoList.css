@@ -1,0 +1,43 @@
+.servicos-container {
+    padding: 10px;
+}
+
+.servicos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    justify-content: center;
+}
+
+.servico-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.servico-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.servico-card.selected {
+    background-color: #f0f0f0;
+    border-color: #a87b5c;
+    box-shadow: 0 0 5px rgba(168, 123, 92, 0.5);
+}
+
+.servico-card h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.servico-card p {
+    margin: 5px 0 0;
+    color: #666;
+    font-style: italic;
+}

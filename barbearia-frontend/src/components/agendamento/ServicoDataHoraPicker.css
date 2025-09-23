@@ -1,0 +1,58 @@
+.servico-data-hora-picker-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.servico-data-hora-picker-container h2 {
+    color: #a87b5c;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.datas-list, .horarios-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.data-button, .horario-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.data-button.selected, .horario-button.selected {
+    background-color: #a87b5c;
+    color: white;
+    border-color: #a87b5c;
+}
+
+.data-button:hover:not(.selected), .horario-button:hover:not(.selected) {
+    background-color: #e0e0e0;
+}
+
+.confirm-section {
+    margin-top: 30px;
+}
+
+.confirm-button {
+    background-color: #333;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.confirm-button:hover {
+    background-color: #a87b5c;
+}

@@ -1,0 +1,52 @@
+.barbeiros-container {
+    text-align: center;
+}
+
+.barbeiros-container h2 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.barbeiros-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.barbeiro-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.barbeiro-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.barbeiro-card h3 {
+    margin-top: 0;
+    color: #a87b5c;
+}
+
+.barbeiro-card p {
+    color: #666;
+    font-style: italic;
+}
+
+.loading-message, .error-message {
+    font-size: 1.2em;
+    color: #555;
+}
+
+.error-message {
+    color: red;
+}

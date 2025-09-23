@@ -1,0 +1,66 @@
+.cliente-login-container {
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.cliente-login-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.cliente-login-container form {
+    display: flex;
+    flex-direction: column;
+   /* align-items: center; */
+    max-width: 450px; 
+}
+
+.cliente-login-container input {
+    /* Mantenha a largura de 100% para responsividade */
+    width: 100%; 
+    /* Aumenta a largura máxima para o campo de input */
+    max-width: 450px; 
+    
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1.2em;
+}
+
+.cliente-login-container input:focus {
+    border-color: #a87b5c;
+    outline: none;
+    box-shadow: 0 0 5px rgba(168, 123, 92, 0.5);
+}
+
+.cliente-login-container button {
+    /* Mantenha a largura de 100% para responsividade */
+    width: 100%;
+    /* Aumenta a largura máxima do botão para combinar com o input */
+    max-width: 450px; 
+    
+    padding: 12px;
+    background-color: #a87b5c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cliente-login-container button:hover {
+    background-color: #8c644c;
+}
+
+.cliente-login-container button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+

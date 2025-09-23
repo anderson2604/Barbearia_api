@@ -1,0 +1,114 @@
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: #333;
+}
+.header {
+  background-color: transparent;
+  padding: 50px 20px;
+  color: hsl(0, 0%, 100%);
+}
+.header-content {
+    display: flex; /* Para alinhar a logo e o título lado a lado */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente o bloco */
+    gap: 15px; /* Espaço entre a logo e o título */
+    margin-bottom: 10px; /* Espaço abaixo do bloco logo+título */
+}
+.header h1 {
+  font-size: 3em;
+  color: #a87b5c;
+}
+.header p {
+  font-size: 1.2em;
+}
+.header-logo {
+    height: 160px; /* Ajuste o tamanho da sua logo conforme necessário */
+    width: auto;
+    border-radius: 50%; /* Se quiser a logo redonda */
+    object-fit: cover; /* Para garantir que a imagem preencha o espaço */
+}
+.header h1 {
+  font-size: 3em;
+  color: #a87b5c;
+  margin: 0; /* Remover margem padrão para melhor alinhamento com a logo */
+}
+
+.header p {
+  font-size: 1.2em;
+}
+.gallery {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+}
+.gallery-item {
+  width: 300px;
+  height: 200px;
+  background-color: #ccc;
+  border-radius: 8px;
+}
+.cta {
+  background-color: #333;
+  color: #fff;
+  padding: 50px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.cta-button {
+  background-color: #a87b5c;
+  color: #fff;
+  padding: 15px 30px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.gallery {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* Permite que as imagens quebrem a linha em telas menores */
+  gap: 20px;
+  padding: 40px 20px;
+}
+
+.gallery-item {
+  width: 300px; /* Largura fixa para os itens da galeria */
+ /* height: 200px; /* Altura fixa para os itens da galeria */
+  overflow: hidden; /* Garante que a imagem não transborde o contêiner */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra para dar profundidade */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain; /* Preenche o espaço sem distorcer a imagem */
+  transition: transform 0.3s ease; /* Efeito de zoom ao passar o mouse */
+}
+
+.gallery-item img:hover {
+    transform: scale(1.05); /* Pequeno zoom ao passar o mouse */
+}
+footer {
+  padding: 20px;
+  text-align: center;
+}
+
+footer p {
+  color: #fff; /* ESTA é a cor do texto do copyright */
+  font-size: 0.9em;
+}

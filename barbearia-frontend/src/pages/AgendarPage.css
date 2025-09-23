@@ -1,0 +1,63 @@
+.agendar-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.agendar-title {
+    color: #fefefe;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.agendar-subtitle {
+    color: #666;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.agendar-content form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 450px; /* Define a largura máxima do formulário inteiro */
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.agendar-content input {
+  width: 100%;
+  padding: 15px 40px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1.2em;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.step-indicator span {
+    font-size: 1em;
+    color: #aaa;
+    transition: color 0.3s ease;
+}
+
+.step-indicator span.active {
+    color: #a87b5c;
+    font-weight: bold;
+    border-bottom: 2px solid #a87b5c;
+    padding-bottom: 5px;
+}
