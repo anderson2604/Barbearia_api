@@ -1,77 +1,17 @@
+/* Tailwind import */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Estilos adicionais */
+.react-tabs__tab--selected {
+  @apply border-b-2 border-blue-600 text-blue-600 font-bold;
+}
+
+.error-message {
+  @apply text-red-500 text-center mt-4;
+}
+
 .dashboard-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f8f9fa;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background-color: #343a40;
-    color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.dashboard-header h2 {
-    margin: 0;
-    font-weight: 400;
-}
-
-.logout-button {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.logout-button:hover {
-    background-color: #c82333;
-}
-
-.dashboard-main {
-    padding: 40px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-.dashboard-card {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 25px;
-}
-
-.dashboard-card h3 {
-    margin-top: 0;
-    color: #333;
-    border-bottom: 2px solid #a87b5c;
-    padding-bottom: 10px;
-}
-
-.dashboard-card ul {
-    list-style: none;
-    padding: 0;
-}
-
-.dashboard-card li {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.dashboard-card p {
-    margin: 5px 0;
-    color: #555;
-}
-
-.dashboard-card span {
-    font-weight: bold;
-    color: #007bff;
+  @apply max-w-7xl mx-auto;
 }
