@@ -1,14 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Limpeza de margens e paddings padrão do navegador */
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* Garante que padding e border não aumentem o tamanho do elemento */
+  box-sizing: border-box;
 }
 
 /* Estilos globais para a aplicação */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4; /* Uma cor de fundo suave para o site */
+  background: linear-gradient(to bottom right, #171616, #201f1f, #2a2929);
+  min-height: 100vh;
   color: #333;
   line-height: 1.6;
 }
@@ -17,53 +22,14 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza horizontalmente */
-  min-height: 100vh; /* Garante que o contêiner ocupa a altura total da tela */
-  width: 100%; /* Ocupa a largura total da tela */
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
 }
 
 /* Estilo para um contêiner principal com largura máxima */
 .main-content {
   width: 100%;
-  max-width: 1200px; /* Largura máxima do conteúdo */
-  padding: 20px;
-  /* Este `margin: 0 auto;` não é mais necessário aqui,
-     pois o Flexbox do #root já faz o alinhamento. */
-}
-
-/* Limpeza de margens e paddings padrão do navegador */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box; 
-}
-
-/* Estilos globais para a aplicação */
-body {
-  font-family: Arial, sans-serif;
-  /* background-color: #f4f4f4;  <-- Remova esta linha */
-  
-  /* --- NOVO FUNDO MODERNISTA (GRADIENTE SUAVE) --- */
-  background: linear-gradient(to bottom right, #171616, #201f1f, #2a2929); /* Tons de cinza suaves */
-  /* Ou se preferir tons de terra/creme: */
-  /* background: linear-gradient(to bottom right, #f8f8f8, #f0e9e1, #f8f8f8); */ /* Creme/bege suave */
-  
-  min-height: 100vh; /* Garante que o gradiente cubra a tela inteira */
-  color: #333;
-  line-height: 1.6;
-}
-
-/* Centraliza o conteúdo da página inteira */
-#root {
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  min-height: 100vh;
-  width: 100%; 
-}
-
-.main-content {
-  width: 100%;
-  max-width: 1200px; 
+  max-width: 1200px;
   padding: 20px;
 }

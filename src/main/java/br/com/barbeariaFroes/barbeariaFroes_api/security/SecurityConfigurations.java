@@ -43,6 +43,8 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.GET, "/servicos").permitAll();
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     req.requestMatchers("/error").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/agendamentos/pendentes").authenticated();
+                    req.requestMatchers(HttpMethod.PUT, "/agendamentos/**").authenticated();
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -62,11 +64,10 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173")); // Porta do seu React (ajuste se for outra)
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-
+        configuration.addAllowedOrigin("http://localhost:5173"); // Porta padrão do Vite
+        configuration.addAllowedMethod("*"); // Permitir todos os métodos (GET, POST, etc.)
+        configuration.addAllowedHeader("*"); // Permitir todos os headers
+        configuration.setAllowCredentials(true); // Permitir envio de credenciais (cookies, tokens)
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

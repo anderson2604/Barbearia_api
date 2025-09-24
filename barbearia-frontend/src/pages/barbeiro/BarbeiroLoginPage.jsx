@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './BarbeiroLoginPage.css';
 import api from '../../services/api';
+import './BarbeiroLoginPage.css';
 
 const BarbeiroLoginPage = () => {
-    // Estas linhas criam as variáveis 'login' e 'senha'.
-    // Sem elas, o erro 'not defined' vai acontecer.
     const [login, setLogin] = useState('');
     const [senha, setSenha] = useState('');
     const [error, setError] = useState('');
@@ -19,17 +16,13 @@ const BarbeiroLoginPage = () => {
         setError('');
 
         try {
-            const response = await api.post('/auth/login', { login, senha });;
-
-           // Armazena o token recebido no localStorage
-            localStorage.setItem('token', response.data);
-
-            if (response.status === 200) {
+            const response = await api.post('/api/login', { login, senha });
+            // Corrigir: salvar apenas o token
+            localStorage.setItem('token', response.data.token); // Alterar de response.data para response.data.token
             navigate('/barbeiro/dashboard'); // Redireciona para o dashboard
-            }
         } catch (err) {
             console.error('Erro de login:', err);
-            setError('Credenciais inválidas. Tente novamente.');
+            setError('Credenciais inválidas ou problema de conexão. Tente novamente.');
         } finally {
             setLoading(false);
         }
