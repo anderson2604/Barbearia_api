@@ -1,5 +1,6 @@
 package br.com.barbeariaFroes.barbeariaFroes_api.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosAgendamentoCliente;
+import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosAgendamentoClienteDTO;
 import br.com.barbeariaFroes.barbeariaFroes_api.model.Agendamento;
 import br.com.barbeariaFroes.barbeariaFroes_api.model.Barbeiro;
 import br.com.barbeariaFroes.barbeariaFroes_api.model.Cliente;
@@ -45,6 +46,20 @@ public class AgendamentoController {
         var agendamentosPendentes = repository.findByBarbeiroIdAndStatus(barbeiroLogado.getId(), StatusAgendamento.PENDENTE);
         return ResponseEntity.ok(agendamentosPendentes);
     }
+    
+    @GetMapping("/confirmados")
+    public ResponseEntity<List<Agendamento>> listarConfirmados(@AuthenticationPrincipal Barbeiro barbeiroLogado) {
+        LocalDateTime agora = LocalDateTime.now();
+        var agendamentosConfirmados = repository.findByBarbeiroIdAndStatus(barbeiroLogado.getId(), StatusAgendamento.CONFIRMADO);
+        return ResponseEntity.ok(agendamentosConfirmados);
+    }
+    
+    @GetMapping("/atrasados")
+    public ResponseEntity<List<Agendamento>> listarAtrasados(@AuthenticationPrincipal Barbeiro barbeiroLogado) {
+        LocalDateTime agora = LocalDateTime.now();
+        var agendamentosAtrasados = repository.findByBarbeiroIdAndStatusAndDataHoraLessThan(barbeiroLogado.getId(), StatusAgendamento.CONFIRMADO, agora);
+        return ResponseEntity.ok(agendamentosAtrasados);
+    }
 
     @PutMapping("/{id}/confirmar")
     @Transactional
@@ -68,9 +83,20 @@ public class AgendamentoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}/realizado")
+    @Transactional
+    public ResponseEntity<Agendamento> realizado(@PathVariable Long id) {
+        return repository.findById(id)
+                .map(agendamento -> {
+                    agendamento.setStatus(StatusAgendamento.REALIZADO);
+                    return ResponseEntity.ok(repository.save(agendamento));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     @Transactional
-    public ResponseEntity<String> agendar(@RequestBody @Valid DadosAgendamentoCliente dados) {
+    public ResponseEntity<String> agendar(@RequestBody @Valid DadosAgendamentoClienteDTO dados) {
         var barbeiro = barbeiroRepository.findById(dados.idBarbeiro()).orElse(null);
         if (barbeiro == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Barbeiro não encontrado.");
@@ -93,7 +119,7 @@ public class AgendamentoController {
         agendamento.setCliente(cliente);
         agendamento.setDataHora(dados.dataHora());
         agendamento.setStatus(StatusAgendamento.PENDENTE);
-        agendamento.setServico(servico); // Usa o objeto persistido
+        agendamento.setServico(servico);
         repository.save(agendamento);
 
         return new ResponseEntity<>("Agendamento criado com sucesso! Aguarde a confirmação.", HttpStatus.CREATED);

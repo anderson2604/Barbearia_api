@@ -39,6 +39,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/clientes").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/barbeiros").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/barbeiros/**").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/barbeiros/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/agendamentos").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/servicos").permitAll();
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();

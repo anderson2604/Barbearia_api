@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public record DadosAgendamentoCliente(
+public record DadosAgendamentoClienteDTO(
     @NotNull Long idBarbeiro,
     @NotBlank String nomeCliente,
     @NotBlank String telefoneCliente,

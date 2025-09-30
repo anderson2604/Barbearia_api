@@ -6,7 +6,7 @@ import './ServicoDataHoraPicker.css';
 
 const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
     const [servicoSelecionado, setServicoSelecionado] = useState(null);
-    const [horariosDisponiveis, setHorariosDisponiveis] = useState({});
+    const [horarios, setHorarios] = useState({});
     const [dataSelecionada, setDataSelecionada] = useState(null);
     const [horarioSelecionado, setHorarioSelecionado] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
         const fetchHorarios = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`http://localhost:8080/barbeiros/${barbeiro.id}/horarios-disponiveis`);
+                const response = await axios.get(`http://localhost:8080/barbeiros/${barbeiro.id}/`); // Correção do endpoint
                 
                 // Transformar o array de objetos em um objeto agrupado por data
                 const horariosPorData = response.data.reduce((acc, horario) => {
@@ -30,7 +30,7 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
                     return acc;
                 }, {});
 
-                setHorariosDisponiveis(horariosPorData);
+                setHorarios(horariosPorData);
             } catch (err) {
                 console.error('Erro ao buscar horários:', err.response?.data || err.message);
                 setError('Não foi possível carregar os horários. Tente novamente mais tarde.');
@@ -55,7 +55,7 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
                 idBarbeiro: barbeiro.id,
                 nomeCliente: cliente.nome,
                 telefoneCliente: cliente.telefone,
-                dataHora: `${dataSelecionada}T${horarioSelecionado}`,
+                dataHora: `${dataSelecionada}T${horarioSelecionado}`, // Formato ISO 8601
                 idServico: servicoSelecionado.id
             };
             console.log('Enviando agendamento:', agendamento);
@@ -75,7 +75,7 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
     if (loading) return <p>Carregando horários...</p>;
     if (error) return <p className="error-message">{error}</p>;
 
-    const datas = Object.keys(horariosDisponiveis);
+    const datas = Object.keys(horarios);
 
     return (
         <div className="servico-data-hora-picker-container">
@@ -107,11 +107,11 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
                 </>
             )}
 
-            {dataSelecionada && horariosDisponiveis[dataSelecionada] && (
+            {dataSelecionada && horarios[dataSelecionada] && (
                 <>
                     <h2>Selecione o Horário</h2>
                     <div className="horarios-list">
-                        {horariosDisponiveis[dataSelecionada].map(horario => (
+                        {horarios[dataSelecionada].map(horario => (
                             <button
                                 key={horario}
                                 className={`horario-button ${horario === horarioSelecionado ? 'selected' : ''}`}
