@@ -1,6 +1,6 @@
 package br.com.barbeariaFroes.barbeariaFroes_api.controller;
 
-import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosAgendamentoCliente;
+import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosAgendamentoClienteDTO;
 import br.com.barbeariaFroes.barbeariaFroes_api.model.Agendamento;
 import br.com.barbeariaFroes.barbeariaFroes_api.model.Cliente;
 import br.com.barbeariaFroes.barbeariaFroes_api.model.StatusAgendamento;
@@ -32,7 +32,7 @@ public class AgendamentoPublicoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<String> agendar(@RequestBody @Valid DadosAgendamentoCliente dados) {
+    public ResponseEntity<String> agendar(@RequestBody @Valid DadosAgendamentoClienteDTO dados) {
         var barbeiro = barbeiroRepository.findById(dados.idBarbeiro()).orElse(null);
         if (barbeiro == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Barbeiro não encontrado.");

@@ -38,12 +38,12 @@ public class SecurityFilter extends OncePerRequestFilter {
             path.startsWith("/barbeiros") ||
             path.startsWith("/servicos") ||
             path.startsWith("/error") ||
-            (path.startsWith("/agendamentos") && method.equals("POST"))) {
+            (path.startsWith("/agendamentos") && method.equals("POST"))){
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Validar token para rotas protegidas
+        // Validar token para rotas protegidas (incluindo PUT /agendamentos/**)
         String token = recoverToken(request);
         if (token != null) {
             try {

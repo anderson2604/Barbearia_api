@@ -1,11 +1,15 @@
 package br.com.barbeariaFroes.barbeariaFroes_api.controller;
 
 import br.com.barbeariaFroes.barbeariaFroes_api.model.Barbeiro;
-import br.com.barbeariaFroes.barbeariaFroes_api.model.HorarioDisponivel;
+import br.com.barbeariaFroes.barbeariaFroes_api.model.Horario;
 import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.BarbeiroCadastroDTO;
+import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosHorarioDTO;
 import br.com.barbeariaFroes.barbeariaFroes_api.repository.BarbeiroRepository;
-import br.com.barbeariaFroes.barbeariaFroes_api.repository.HorarioDisponivelRepository;
+import br.com.barbeariaFroes.barbeariaFroes_api.repository.HorarioRepository;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +24,7 @@ public class BarbeiroController {
     private BarbeiroRepository barbeiroRepository;
 
     @Autowired
-    private HorarioDisponivelRepository horarioDisponivelRepository;
+    private HorarioRepository horarioRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -39,9 +43,27 @@ public class BarbeiroController {
         return ResponseEntity.ok(barbeiros);
     }
 
-    @GetMapping("/{id}/horarios-disponiveis")
-    public ResponseEntity<List<HorarioDisponivel>> listarHorariosDisponiveis(@PathVariable Long id) {
-        List<HorarioDisponivel> horarios = horarioDisponivelRepository.findByBarbeiroIdAndDisponivelTrue(id);
+    @GetMapping("/{id}/")
+    public ResponseEntity<List<Horario>> listarHorarios(@PathVariable Long id) {
+        List<Horario> horarios = horarioRepository.findByBarbeiroId(id);
         return ResponseEntity.ok(horarios);
     }
+    
+    @PostMapping("/{id}/horario")
+    public ResponseEntity<String> criarHorario(@RequestBody @Valid DadosHorarioDTO dados){
+		var barbeiro = barbeiroRepository.findById(dados.getIdBarbeiro()).orElse(null);
+		if(barbeiro == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Barbeiro não encontrado.");
+		}
+		
+		var horario = new Horario();
+		horario.setBarbeiro(barbeiro);
+		horario.setData(dados.getData());
+		horario.setHora(dados.getHora());
+		horario.setDisponivel(true);
+		
+		horarioRepository.save(horario);
+		
+		return new ResponseEntity<>("Horário criado com sucesso!", HttpStatus.CREATED);
+	}
 }

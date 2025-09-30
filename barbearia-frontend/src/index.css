@@ -33,3 +33,9 @@ body {
   max-width: 1200px;
   padding: 20px;
 }
+
+.react-tabs {
+  height: auto !important;
+  border: 1px solid #e5e7eb !important; /* Corresponde a border-gray-200 */
+  border-radius: 1rem !important; /* Corresponde a rounded-2xl */
+}

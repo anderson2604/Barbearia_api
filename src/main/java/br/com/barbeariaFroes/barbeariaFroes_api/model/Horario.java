@@ -9,11 +9,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "horarios_disponiveis")
+@Table(name = "horarios")
 @Getter
 @Setter
 @NoArgsConstructor
-public class HorarioDisponivel {
+public class Horario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class HorarioDisponivel {
     
     private boolean disponivel = true;
 
-    public HorarioDisponivel(Barbeiro barbeiro, LocalDate data, LocalTime hora) {
+    public Horario(Barbeiro barbeiro, LocalDate data, LocalTime hora) {
         this.barbeiro = barbeiro;
         this.data = data;
         this.hora = hora;
