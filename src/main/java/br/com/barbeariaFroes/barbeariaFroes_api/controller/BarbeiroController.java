@@ -66,4 +66,10 @@ public class BarbeiroController {
 		
 		return new ResponseEntity<>("Horário criado com sucesso!", HttpStatus.CREATED);
 	}
+    
+    @GetMapping("/{id}/horarios")
+    public ResponseEntity<List<Horario>> getHorariosByBarbeiro(@PathVariable Long id) {
+        // Lógica para buscar horários do barbeiro com ID 'id'
+        return ResponseEntity.ok(horarioRepository.findByBarbeiroId(id));
+    }
 }

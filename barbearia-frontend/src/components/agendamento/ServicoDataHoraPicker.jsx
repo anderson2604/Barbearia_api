@@ -18,15 +18,15 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
         const fetchHorarios = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`http://localhost:8080/barbeiros/${barbeiro.id}/`); // Correção do endpoint
+                const response = await axios.get(`http://localhost:8080/barbeiros/${barbeiro.id}/horarios`);
                 
                 // Transformar o array de objetos em um objeto agrupado por data
                 const horariosPorData = response.data.reduce((acc, horario) => {
-                    const data = horario.data; // Ex.: "2025-09-20"
+                    const data = horario.data;
                     if (!acc[data]) {
                         acc[data] = [];
                     }
-                    acc[data].push(horario.hora); // Ex.: "09:00:00"
+                    acc[data].push(horario.hora);
                     return acc;
                 }, {});
 
@@ -51,11 +51,14 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
         }
 
         try {
+            // Garantir que dataHora esteja no formato esperado pelo backend (yyyy-MM-dd'T'HH:mm:ss)
+            const [hours, minutes] = horarioSelecionado.split(':');
+            const dataHora = `${dataSelecionada}T${hours}:${minutes}:00`; // Garante o formato correto
             const agendamento = {
                 idBarbeiro: barbeiro.id,
                 nomeCliente: cliente.nome,
                 telefoneCliente: cliente.telefone,
-                dataHora: `${dataSelecionada}T${horarioSelecionado}`, // Formato ISO 8601
+                dataHora,
                 idServico: servicoSelecionado.id
             };
             console.log('Enviando agendamento:', agendamento);
@@ -67,8 +70,9 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
             alert('Agendamento confirmado com sucesso!');
             navigate('/');
         } catch (err) {
-            console.error('Erro ao agendar:', err.response?.data || err.message);
-            setError('Falha ao agendar. Tente novamente.');
+            const errorDetails = err.response?.data ? JSON.stringify(err.response.data, null, 2) : err.message;
+            console.error('Erro ao agendar - Resposta completa:', err.response?.data || err.message);
+            setError(`Falha ao agendar. Detalhes:\n${errorDetails}`);
         }
     };
 
@@ -100,7 +104,12 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
                                     setHorarioSelecionado(null);
                                 }}
                             >
-                                {new Date(data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
+                                {new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', { 
+                                    timeZone: 'America/Sao_Paulo', 
+                                    weekday: 'long', 
+                                    day: 'numeric', 
+                                    month: 'short' 
+                                })}
                             </button>
                         ))}
                     </div>
