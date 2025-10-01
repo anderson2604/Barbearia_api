@@ -57,7 +57,12 @@ public class AgendamentoController {
     @GetMapping("/atrasados")
     public ResponseEntity<List<Agendamento>> listarAtrasados(@AuthenticationPrincipal Barbeiro barbeiroLogado) {
         LocalDateTime agora = LocalDateTime.now();
-        var agendamentosAtrasados = repository.findByBarbeiroIdAndStatusAndDataHoraLessThan(barbeiroLogado.getId(), StatusAgendamento.CONFIRMADO, agora);
+        LocalDateTime dataHoraZero = agora.toLocalDate().atStartOfDay();
+        var agendamentosAtrasados = repository.findByBarbeiroIdAndStatusAndDataHoraBetween(
+                barbeiroLogado.getId(), 
+                StatusAgendamento.CONFIRMADO, 
+                dataHoraZero,
+                agora);
         return ResponseEntity.ok(agendamentosAtrasados);
     }
 

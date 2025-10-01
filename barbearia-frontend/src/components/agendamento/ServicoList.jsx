@@ -13,7 +13,7 @@ const ServicoList = ({ onSelectServico, servicoSelecionado }) => {
                 setLoading(true);
                 const response = await axios.get('http://localhost:8080/servicos');
                 setServicos(response.data); // Ex.: [{ id: 1, nome: 'Corte', preco: 40.00 }, ...]
-                console.log('Serviços carregados:', response.data);
+               // console.log('Serviços carregados:', response.data);
             } catch (err) {
                 console.error('Erro ao buscar serviços:', err.response?.data || err.message);
                 setError('Não foi possível carregar os serviços. Tente novamente.');

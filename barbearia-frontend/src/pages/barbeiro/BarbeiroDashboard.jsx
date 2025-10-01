@@ -41,7 +41,6 @@ const BarbeiroDashboard = () => {
 
         // Filtrar agendamentos pendentes e confirmados a partir de agora
         const agora = new Date();
-        agora.setHours(19, 17, 0, 0); // Definir como 19:17 do dia atual (29/09/2025)
         const pendentesFiltrados = pendentesRes.data.filter(agendamento => {
           const dataAgendamento = new Date(agendamento.dataHora);
           return dataAgendamento >= agora;
@@ -92,7 +91,6 @@ const BarbeiroDashboard = () => {
         api.get('/agendamentos/atrasados'),
       ]);
       const agora = new Date();
-      agora.setHours(19, 17, 0, 0);
       const pendentesFiltrados = pendentesRes.data.filter(agendamento => new Date(agendamento.dataHora) >= agora);
       const confirmadosFiltrados = confirmadosRes.data.filter(agendamento => new Date(agendamento.dataHora) >= agora);
       setAgendamentosPendentes(pendentesFiltrados);
@@ -139,7 +137,7 @@ const BarbeiroDashboard = () => {
   // Função para carregar horários disponíveis de um barbeiro
   const fetchHorarios = async (barbeiroId) => {
     try {
-      const response = await api.get(`/barbeiros/${barbeiroId}/`);
+      const response = await api.get(`/barbeiros/${barbeiroId}/horarios`);
       setHorarios(response.data);
     } catch (err) {
       setError('Erro ao carregar horários.');
@@ -174,7 +172,7 @@ const BarbeiroDashboard = () => {
   const fetchDias = async (barbeiroId) => {
     try {
       console.log('Barbeiro ID recebido:', barbeiroId);
-      const response = await api.get(`/barbeiros/${barbeiroId}/`);
+      const response = await api.get(`/barbeiros/${barbeiroId}/horarios`);
       const horariosData = response.data;
       const diasUnicos = [...new Set(horariosData.map(horario => horario.data))];
       setDiasDisponiveis(diasUnicos.length > 0 ? diasUnicos : ['Nenhum horário disponível']);
@@ -186,7 +184,7 @@ const BarbeiroDashboard = () => {
 
   const fetchHorariosDoDia = async (dia) => {
     try {
-      const response = await api.get(`/barbeiros/${novoHorario.barbeiroId}/`);
+      const response = await api.get(`/barbeiros/${novoHorario.barbeiroId}/horarios`);
       const horariosData = response.data;
       const horariosFiltrados = horariosData.filter(horario => horario.data === dia);
       setHorariosDoDia(horariosFiltrados.length > 0 ? horariosFiltrados : []);
@@ -264,8 +262,8 @@ const BarbeiroDashboard = () => {
                         <strong>Data/Hora:</strong>{' '}
                         {agendamento.dataHora ? (
                           <span className="ml-1">
-                            {new Date(agendamento.dataHora).toLocaleDateString('pt-BR')}{' '}
-                            {new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(agendamento.dataHora).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}{' '}
+                            {new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                           </span>
                         ) : (
                           'Não informada'
@@ -282,7 +280,7 @@ const BarbeiroDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">Nenhum agendamento pendente a partir de hoje.</p>
+              <p className="text-gray-500">Nenhum agendamento pendente.</p>
             )}
 
             <h3 className="text-xl font-semibold text-green-800 mb-4 mt-6">Confirmados ({agendamentosConfirmados.length})</h3>
@@ -296,8 +294,8 @@ const BarbeiroDashboard = () => {
                         <strong>Data/Hora:</strong>{' '}
                         {agendamento.dataHora ? (
                           <span className="ml-1">
-                            {new Date(agendamento.dataHora).toLocaleDateString('pt-BR')}{' '}
-                            {new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(agendamento.dataHora).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}{' '}
+                            {new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                           </span>
                         ) : (
                           'Não informada'
@@ -314,7 +312,7 @@ const BarbeiroDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">Nenhum agendamento confirmado a partir de hoje.</p>
+              <p className="text-gray-500">Nenhum agendamento confirmado.</p>
             )}
 
             <h3 className="text-xl font-semibold text-yellow-700 mb-4 mt-6">Atrasados ({agendamentosAtrasados.length})</h3>
@@ -328,8 +326,8 @@ const BarbeiroDashboard = () => {
                         <strong>Data/Hora:</strong>{' '}
                         {agendamento.dataHora ? (
                           <span className="ml-1">
-                            {new Date(agendamento.dataHora).toLocaleDateString('pt-BR')}{' '}
-                            {new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(agendamento.dataHora).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}{' '}
+                            {new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                           </span>
                         ) : (
                           'Não informada'
@@ -394,7 +392,7 @@ const BarbeiroDashboard = () => {
                     key={index}
                     className="bg-gray-50 p-2 rounded cursor-pointer hover:bg-gray-200"
                     onClick={() => openHorariosModal(dia)}>
-                    {dia === 'Nenhum horário disponível' ? dia : dia}
+                    {new Date(dia + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'short' })}
                   </li>
                 ))}
               </ul>
@@ -408,7 +406,7 @@ const BarbeiroDashboard = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
               <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-lg max-w-xl w-full m-4 modal-content">
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
-                  Horários Disponíveis - {diaSelecionado}
+                  Horários Disponíveis - {new Date(diaSelecionado + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'short' })}
                 </h3>
                 {horariosDoDia.length > 0 ? (
                   <ul className="grid gap-2">
@@ -477,7 +475,7 @@ const BarbeiroDashboard = () => {
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Detalhes do Agendamento</h3>
                 <div className="space-y-3">
                   <p className="text-gray-800 text-sm sm:text-base"><strong>Cliente:</strong> {selectedAgendamento.cliente.nome}</p>
-                  <p className="whitespace-nowrap text-gray-800 text-sm sm:text-base"><strong>Data/Hora:</strong> {new Date(selectedAgendamento.dataHora).toLocaleString()}</p>
+                  <p className="whitespace-nowrap text-gray-800 text-sm sm:text-base"><strong>Data/Hora:</strong> {new Date(selectedAgendamento.dataHora).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
                   <p className="text-gray-800 text-sm sm:text-base"><strong>Status:</strong> {selectedAgendamento.status}</p>
                 </div>
                 {(modalType === 'confirmados' || modalType === 'atrasados') && (
