@@ -56,3 +56,17 @@
 .confirm-button:hover {
     background-color: #a87b5c;
 }
+
+.agendamento-info {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.cliente-info,
+.barbeiro-info,
+.servico-info {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #cbcea0;
+    margin-bottom: 0.5rem;
+}

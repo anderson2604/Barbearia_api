@@ -1,20 +1,27 @@
 package br.com.barbeariaFroes.barbeariaFroes_api.controller;
 
-import br.com.barbeariaFroes.barbeariaFroes_api.model.Barbeiro;
-import br.com.barbeariaFroes.barbeariaFroes_api.model.Horario;
-import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.BarbeiroCadastroDTO;
-import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosHorarioDTO;
-import br.com.barbeariaFroes.barbeariaFroes_api.repository.BarbeiroRepository;
-import br.com.barbeariaFroes.barbeariaFroes_api.repository.HorarioRepository;
-import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.BarbeiroCadastroDTO;
+import br.com.barbeariaFroes.barbeariaFroes_api.controller.dto.DadosHorarioDTO;
+import br.com.barbeariaFroes.barbeariaFroes_api.model.Barbeiro;
+import br.com.barbeariaFroes.barbeariaFroes_api.model.Horario;
+import br.com.barbeariaFroes.barbeariaFroes_api.repository.BarbeiroRepository;
+import br.com.barbeariaFroes.barbeariaFroes_api.repository.HorarioRepository;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/barbeiros")
@@ -45,7 +52,7 @@ public class BarbeiroController {
 
     @GetMapping("/{id}/")
     public ResponseEntity<List<Horario>> listarHorarios(@PathVariable Long id) {
-        List<Horario> horarios = horarioRepository.findByBarbeiroId(id);
+        List<Horario> horarios = horarioRepository.findByBarbeiroIdOrderByDataAscHoraAsc(id);
         return ResponseEntity.ok(horarios);
     }
     
@@ -69,7 +76,9 @@ public class BarbeiroController {
     
     @GetMapping("/{id}/horarios")
     public ResponseEntity<List<Horario>> getHorariosByBarbeiro(@PathVariable Long id) {
-        // Lógica para buscar horários do barbeiro com ID 'id'
-        return ResponseEntity.ok(horarioRepository.findByBarbeiroId(id));
+    	LocalDate dataAtual = LocalDate.now();
+        LocalTime horaAtual = LocalTime.now();
+        List<Horario> horarios = horarioRepository.findByBarbeiroIdAndDataHoraGreaterThanEqual(id, dataAtual, horaAtual);
+        return ResponseEntity.ok(horarios);
     }
 }
