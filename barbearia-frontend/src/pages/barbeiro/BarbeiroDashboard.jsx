@@ -15,7 +15,6 @@ const BarbeiroDashboard = () => {
   const [horariosDoDia, setHorariosDoDia] = useState([]);
   const [diaSelecionado, setDiaSelecionado] = useState(null);
   const [modalHorariosOpen, setModalHorariosOpen] = useState(false);
-  const [modalAdicionarHorarioOpen, setModalAdicionarHorarioOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [novoBarbeiro, setNovoBarbeiro] = useState({ nome: '', email: '', senha: '' });
@@ -137,8 +136,18 @@ const BarbeiroDashboard = () => {
   // Função para carregar horários disponíveis de um barbeiro
   const fetchHorarios = async (barbeiroId) => {
     try {
-      const response = await api.get(`/barbeiros/${barbeiroId}/horarios`);
-      setHorarios(response.data);
+      if(barbeiroId){
+        const response = await api.get(`/barbeiros/${barbeiroId}/horarios`);
+        setHorarios(response.data);
+        setNovoHorario({ ...novoHorario, barbeiroId, data: '', hora: '' });      
+      } else {
+        setHorarios([]);
+        setNovoHorario((prev) => ({
+          ...prev,
+          data: '',
+          hora: ''
+        }))
+      }
     } catch (err) {
       setError('Erro ao carregar horários.');
       console.error('Erro:', err);
@@ -148,10 +157,10 @@ const BarbeiroDashboard = () => {
   // Função para adicionar horário disponível
   const handleAdicionarHorario = async (e) => {
     e.preventDefault();
-    setModalAdicionarHorarioOpen(true);
-  };
-
-  const handleConfirmarAdicionarHorario = async () => {
+    if (!novoHorario.barbeiroId || !novoHorario.data || !novoHorario.hora) {
+      setError('Por favor, preencha todos os campos.');
+      return;
+    }
     try {
       const dados = {
         idBarbeiro: novoHorario.barbeiroId,
@@ -159,9 +168,9 @@ const BarbeiroDashboard = () => {
         hora: novoHorario.hora,
       };
       await api.post(`/barbeiros/${novoHorario.barbeiroId}/horario`, dados);
+      await fetchDias(novoHorario.barbeiroId);
       await fetchHorarios(novoHorario.barbeiroId);
-      setNovoHorario({ barbeiroId: '', data: '', hora: '' });
-      setModalAdicionarHorarioOpen(false);
+      setNovoHorario({ ...novoHorario, data: novoHorario.data, hora: '' }); // Mantém barbeiroId, reseta data e hora
       setError(null);
     } catch (err) {
       setError('Erro ao adicionar horário.');
@@ -169,9 +178,32 @@ const BarbeiroDashboard = () => {
     }
   };
 
+  const handleBarbeiroChange = (barbeiroId) => {
+    if (barbeiroId) {
+      setNovoHorario((prev) => ({
+        ...prev,
+        barbeiroId,
+        data: '',
+        hora: ''
+      }));
+      fetchHorarios(barbeiroId);
+    } else {
+      setNovoHorario((prev) => ({
+        ...prev,
+        data: '',
+        hora: ''
+      }));
+      setHorarios([]);
+    }
+  };
+
   const fetchDias = async (barbeiroId) => {
     try {
-      console.log('Barbeiro ID recebido:', barbeiroId);
+      if (!barbeiroId) {
+        setDiasDisponiveis([]);
+        return;
+      }
+      //console.log('Buscando dias para barbeiro ID:', barbeiroId);
       const response = await api.get(`/barbeiros/${barbeiroId}/horarios`);
       const horariosData = response.data;
       const diasUnicos = [...new Set(horariosData.map(horario => horario.data))];
@@ -184,6 +216,10 @@ const BarbeiroDashboard = () => {
 
   const fetchHorariosDoDia = async (dia) => {
     try {
+      if (!novoHorario.barbeiroId) {
+        setHorariosDoDia([]);
+        return;
+      }
       const response = await api.get(`/barbeiros/${novoHorario.barbeiroId}/horarios`);
       const horariosData = response.data;
       const horariosFiltrados = horariosData.filter(horario => horario.data === dia);
@@ -204,11 +240,6 @@ const BarbeiroDashboard = () => {
     setModalHorariosOpen(false);
     setDiaSelecionado(null);
     setHorariosDoDia([]);
-  };
-
-  const closeAdicionarHorarioModal = () => {
-    setModalAdicionarHorarioOpen(false);
-    setNovoHorario({ barbeiroId: '', data: '', hora: '' });
   };
 
   if (loading) {
@@ -351,37 +382,51 @@ const BarbeiroDashboard = () => {
           {/* Aba de Horários */}
           <TabPanel>
             <h3 className="text-xl font-semibold text-gray-700 mb-4 mt-6">Gerenciar Horários Disponíveis</h3>
-            <form onSubmit={handleAdicionarHorario} className="mb-6">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <select
-                  value={novoHorario.barbeiroId}
-                  onChange={(e) => {
-                    const selectedBarbeiroId = e.target.value;
-                    setNovoHorario({ ...novoHorario, barbeiroId: selectedBarbeiroId });
-                    if (selectedBarbeiroId) {
-                      fetchDias(selectedBarbeiroId);
-                    } else {
-                      setDiasDisponiveis([]);
-                    }
-                  }}
-                  className="border rounded p-2"
-                  required>
-                  <option value="">Selecione um barbeiro</option>
-                  {barbeiros.map((barbeiro) => (
-                    <option key={barbeiro.id} value={barbeiro.id}>
-                      {barbeiro.nome}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="date"
-                  value={novoHorario.data}
-                  onChange={(e) => setNovoHorario({ ...novoHorario, data: e.target.value })}
-                  className="border rounded p-2"
-                  required
-                />
-              </div>
-              <button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <form onSubmit={handleAdicionarHorario} className="mb-6 grid gap-4 sm:grid-cols-3">
+              <select
+                value={novoHorario.barbeiroId}
+                onChange={(e) => {
+                  const selectedBarbeiroId = e.target.value;
+                  setNovoHorario({ ...novoHorario, barbeiroId: selectedBarbeiroId });
+                  if (selectedBarbeiroId) {
+                    fetchDias(selectedBarbeiroId);
+                    fetchHorarios(selectedBarbeiroId);
+                  } else {
+                    setDiasDisponiveis([]);
+                    setHorarios([]);
+                  }
+                }}
+                className="border rounded p-2"
+                required
+              >
+                <option value="">Selecione um barbeiro</option>
+                {barbeiros.map((barbeiro) => (
+                  <option key={barbeiro.id} value={barbeiro.id}>
+                    {barbeiro.nome}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="date"
+                value={novoHorario.data}
+                onChange={(e) => setNovoHorario({ ...novoHorario, data: e.target.value })}
+                className="border rounded p-2"
+                required
+              />
+              <select
+                value={novoHorario.hora}
+                onChange={(e) => setNovoHorario({ ...novoHorario, hora: e.target.value })}
+                className="border rounded p-2"
+                required
+              >
+                <option value="">Selecione um horário</option>
+                {generateTimeOptions().map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="sm:col-span-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 Adicionar Horário
               </button>
             </form>
@@ -391,7 +436,8 @@ const BarbeiroDashboard = () => {
                   <li
                     key={index}
                     className="bg-gray-50 p-2 rounded cursor-pointer hover:bg-gray-200"
-                    onClick={() => openHorariosModal(dia)}>
+                    onClick={() => openHorariosModal(dia)}
+                  >
                     {new Date(dia + 'T00:00:00').toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'short' })}
                   </li>
                 ))}
@@ -424,46 +470,10 @@ const BarbeiroDashboard = () => {
                 )}
                 <button
                   onClick={closeHorariosModal}
-                  className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full text-sm sm:text-base">
+                  className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full text-sm sm:text-base"
+                >
                   Fechar
                 </button>
-              </div>
-            </div>
-          )}
-
-          {/* Modal para adicionar horário */}
-          {modalAdicionarHorarioOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
-              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-lg max-w-xl w-full m-4 modal-content">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Adicionar Novo Horário</h3>
-                <div className="space-y-3">
-                  <p><strong>Barbeiro:</strong> {barbeiros.find(b => b.id === parseInt(novoHorario.barbeiroId))?.nome || 'N/A'}</p>
-                  <p><strong>Data:</strong> {novoHorario.data}</p>
-                  <select
-                    value={novoHorario.hora}
-                    onChange={(e) => setNovoHorario({ ...novoHorario, hora: e.target.value })}
-                    className="border rounded p-2 w-full"
-                    required>
-                    <option value="">Selecione um horário</option>
-                    {generateTimeOptions().map((time) => (
-                      <option key={time} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex space-x-2 mt-4">
-                  <button
-                    onClick={handleConfirmarAdicionarHorario}
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex-1 text-sm sm:text-base">
-                    Adicionar
-                  </button>
-                  <button
-                    onClick={closeAdicionarHorarioModal}
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex-1 text-sm sm:text-base">
-                    Cancelar
-                  </button>
-                </div>
               </div>
             </div>
           )}
@@ -482,7 +492,8 @@ const BarbeiroDashboard = () => {
                   <div className="flex space-x-2 mt-4">
                     <button
                       onClick={() => handleGerenciarAgendamento(selectedAgendamento.id, 'REALIZADO')}
-                      className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex-1 text-sm sm:text-base">
+                      className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex-1 text-sm sm:text-base"
+                    >
                       Confirmar Realizado
                     </button>
                   </div>
@@ -491,19 +502,22 @@ const BarbeiroDashboard = () => {
                   <div className="flex space-x-2 mt-4">
                     <button
                       onClick={() => handleGerenciarAgendamento(selectedAgendamento.id, 'CONFIRMADO')}
-                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex-1 text-sm sm:text-base">
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex-1 text-sm sm:text-base"
+                    >
                       Confirmar
                     </button>
                     <button
                       onClick={() => handleGerenciarAgendamento(selectedAgendamento.id, 'CANCELADO_PELO_BARBEIRO')}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-1 text-sm sm:text-base">
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-1 text-sm sm:text-base"
+                    >
                       Rejeitar
                     </button>
                   </div>
                 )}
                 <button
                   onClick={closeModal}
-                  className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full text-sm sm:text-base">
+                  className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full text-sm sm:text-base"
+                >
                   Fechar
                 </button>
               </div>
@@ -559,7 +573,8 @@ const BarbeiroDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setEditingBarbeiro(null)}
-                  className="mt-4 ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                  className="mt-4 ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
                   Cancelar
                 </button>
               )}
@@ -573,7 +588,8 @@ const BarbeiroDashboard = () => {
                   </div>
                   <button
                     onClick={() => setEditingBarbeiro(barbeiro)}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                  >
                     Editar
                   </button>
                 </li>

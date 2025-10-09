@@ -14,39 +14,37 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Agendamento {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST) // Adicione cascade
+    @ManyToOne
+    @JoinColumn(name = "horario_id")
+    private Horario horario;
+
+    @ManyToOne
+    @JoinColumn(name = "barbeiro_id")
     private Barbeiro barbeiro;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    private Cliente cliente;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
+    @JoinColumn(name = "servico_id")
     private Servico servico;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
     private LocalDateTime dataHora;
 
     @Enumerated(EnumType.STRING)
     private StatusAgendamento status;
 
-    public Agendamento(LocalDateTime dataHora, Servico servico, Cliente cliente, Barbeiro barbeiro, StatusAgendamento status) {
-        this.dataHora = dataHora;
+    public Agendamento(Horario horario, Barbeiro barbeiro, Servico servico, Cliente cliente, LocalDateTime dataHora, StatusAgendamento status) {
+        this.horario = horario;
+        this.barbeiro = barbeiro;
         this.servico = servico;
         this.cliente = cliente;
-        this.barbeiro = barbeiro;
+        this.dataHora = dataHora;
         this.status = status;
-    }
-
-    // Getter e Setter para 'status' já são gerados pela anotação @Setter e @Getter do Lombok,
-    // mas para clareza, aqui está o método setStatus explicitamente (caso não use Lombok):
-    public void setStatus(StatusAgendamento status) {
-        this.status = status;
-    }
-
-    public StatusAgendamento getStatus() {
-        return status;
     }
 }

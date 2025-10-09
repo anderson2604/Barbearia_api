@@ -14,9 +14,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     // Busca agendamentos pendentes por ID do barbeiro
     List<Agendamento> findByBarbeiroIdAndStatus(Long barbeiroId, StatusAgendamento status);
 
-    // Busca agendamentos confirmados por ID do barbeiro
-    //List<Agendamento> findByBarbeiroIdAndStatus(Long barbeiroId, StatusAgendamento status);
-
     // Busca agendamentos confirmados atrasados entre dataHoraZero e dataHora
     @Query("SELECT a FROM Agendamento a WHERE a.barbeiro.id = :barbeiroId AND a.status = :status "
     		+ "AND a.dataHora >= :dataHoraZero AND a.dataHora < :dataHora")

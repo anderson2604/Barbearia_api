@@ -18,22 +18,27 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
         const fetchHorarios = async () => {
             try {
                 setLoading(true);
+                setHorarios({});
+                //console.log(`Buscando horários para barbeiro ID: ${barbeiro.id}`);
                 const response = await axios.get(`http://localhost:8080/barbeiros/${barbeiro.id}/horarios`);
-                
+                console.log('Horários recebidos:', response.data);
                 // Transformar o array de objetos em um objeto agrupado por data
                 const horariosPorData = response.data.reduce((acc, horario) => {
                     const data = horario.data;
+                    // Normalizar hora para "HH:mm"
+                    const hora = horario.hora.split(':').slice(0, 2).join(':');
                     if (!acc[data]) {
                         acc[data] = [];
                     }
-                    acc[data].push(horario.hora);
+                    if (!acc[data].includes(hora)) {
+                        acc[data].push(hora);
+                    }
                     return acc;
                 }, {});
-
                 setHorarios(horariosPorData);
             } catch (err) {
                 console.error('Erro ao buscar horários:', err.response?.data || err.message);
-                setError('Não foi possível carregar os horários. Tente novamente mais tarde.');
+                setError(`Não foi possível carregar os horários. Detalhes: ${err.response?.data?.message || err.message}`);
             } finally {
                 setLoading(false);
             }
@@ -41,6 +46,10 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
 
         if (barbeiro && barbeiro.id) {
             fetchHorarios();
+        } else {
+            setHorarios({});
+            setDataSelecionada(null);
+            setHorarioSelecionado(null);
         }
     }, [barbeiro]);
 
@@ -51,27 +60,29 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
         }
 
         try {
-            // Garantir que dataHora esteja no formato esperado pelo backend (yyyy-MM-dd'T'HH:mm:ss)
+            // Formatar dataHora como "yyyy-MM-ddTHH:mm:ss"
             const [hours, minutes] = horarioSelecionado.split(':');
-            const dataHora = `${dataSelecionada}T${hours}:${minutes}:00`; // Garante o formato correto
+            const dataHora = `${dataSelecionada}T${hours}:${minutes}:00`;
             const agendamento = {
                 idBarbeiro: barbeiro.id,
+                idServico: servicoSelecionado.id,
                 nomeCliente: cliente.nome,
                 telefoneCliente: cliente.telefone,
                 dataHora,
-                idServico: servicoSelecionado.id
+                status: 'PENDENTE'
             };
-            console.log('Enviando agendamento:', agendamento);
+            console.log('Payload do agendamento antes do envio:', JSON.stringify(agendamento, null, 2));
 
             const response = await axios.post('http://localhost:8080/agendamentos', agendamento, {
                 headers: { 'Content-Type': 'application/json' }
             });
+            console.log('Resposta do agendamento:', response.data);
             onAgendamentoSuccess(response.data);
             alert('Agendamento confirmado com sucesso!');
             navigate('/');
         } catch (err) {
             const errorDetails = err.response?.data ? JSON.stringify(err.response.data, null, 2) : err.message;
-            console.error('Erro ao agendar - Resposta completa:', err.response?.data || err.message);
+            console.error('Erro ao agendar - Resposta completa:', errorDetails);
             setError(`Falha ao agendar. Detalhes:\n${errorDetails}`);
         }
     };
@@ -83,16 +94,29 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
 
     return (
         <div className="servico-data-hora-picker-container">
-            {/* Renderiza a lista de serviços SOMENTE se nenhum serviço foi selecionado */}
+            <div className="agendamento-info">
+                {cliente && (
+                    <h3 className="cliente-info">
+                        Cliente: {cliente.nome}
+                    </h3>
+                )}
+                {barbeiro && (
+                    <h3 className="barbeiro-info">
+                        Barbeiro: {barbeiro.nome}
+                    </h3>
+                )}
+            </div>
             {!servicoSelecionado && (
                 <>
                     <h2>Selecione o Serviço</h2>
                     <ServicoList onSelectServico={setServicoSelecionado} servicoSelecionado={servicoSelecionado} />
                 </>
             )}
-
             {servicoSelecionado && (
                 <>
+                    <h3 className="servico-info">
+                        Serviço: {servicoSelecionado.nome} (R$ {servicoSelecionado.preco.toFixed(2)})
+                    </h3>
                     <h2>Selecione a Data</h2>
                     <div className="datas-list">
                         {datas.map(data => (
@@ -104,18 +128,17 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
                                     setHorarioSelecionado(null);
                                 }}
                             >
-                                {new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', { 
-                                    timeZone: 'America/Sao_Paulo', 
-                                    weekday: 'long', 
-                                    day: 'numeric', 
-                                    month: 'short' 
+                                {new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {
+                                    timeZone: 'America/Sao_Paulo',
+                                    weekday: 'long',
+                                    day: 'numeric',
+                                    month: 'short'
                                 })}
                             </button>
                         ))}
                     </div>
                 </>
             )}
-
             {dataSelecionada && horarios[dataSelecionada] && (
                 <>
                     <h2>Selecione o Horário</h2>
@@ -132,7 +155,6 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
                     </div>
                 </>
             )}
-
             {servicoSelecionado && dataSelecionada && horarioSelecionado && (
                 <div className="confirm-section">
                     <button className="confirm-button" onClick={handleConfirmarAgendamento}>

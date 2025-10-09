@@ -7,8 +7,8 @@ import './AgendarPage.css';
 
 const AgendarPage = () => {
     // 0: Login, 1: Cadastro, 2: Escolha do Barbeiro, 3: Escolha do Serviço/Data
-    const [step, setStep] = useState(0); 
-    const [cliente, setCliente] = useState(null); // Variável 'cliente' adicionada
+    const [step, setStep] = useState(0);
+    const [cliente, setCliente] = useState(null);
     const [barbeiroSelecionado, setBarbeiroSelecionado] = useState(null);
 
     const handleLoginSuccess = (clienteData) => {
@@ -31,35 +31,41 @@ const AgendarPage = () => {
     };
 
     const handleAgendamentoSuccess = () => {
-        //alert('Seu agendamento foi realizado com sucesso!');
-        // Opcional: Redirecione o usuário após o agendamento
-         window.location.href = '/'; 
+        // alert('Seu agendamento foi realizado com sucesso!');
+        window.location.href = '/';
     };
 
     const renderStep = () => {
         switch (step) {
             case 0:
                 return (
-                    <ClienteLogin 
+                    <ClienteLogin
                         onLoginSuccess={handleLoginSuccess}
-                        onClienteNotFound={handleClienteNotFound} 
+                        onClienteNotFound={handleClienteNotFound}
                     />
                 );
             case 1:
                 return (
-                    <ClienteCadastroModal 
-                        onCadastroSuccess={handleCadastroSuccess} 
+                    <ClienteCadastroModal
+                        onCadastroSuccess={handleCadastroSuccess}
                     />
                 );
             case 2:
                 return (
-                    <BarbeirosList 
-                        onBarbeiroSelected={handleBarbeiroSelected} 
-                    />
+                    <div>
+                        {cliente && (
+                            <h3 className="cliente-info">
+                                Cliente: {cliente.nome}
+                            </h3>
+                        )}
+                        <BarbeirosList
+                            onBarbeiroSelected={handleBarbeiroSelected}
+                        />
+                    </div>
                 );
             case 3:
                 return (
-                    <ServicoDataHoraPicker 
+                    <ServicoDataHoraPicker
                         barbeiro={barbeiroSelecionado}
                         cliente={cliente}
                         onAgendamentoSuccess={handleAgendamentoSuccess}
