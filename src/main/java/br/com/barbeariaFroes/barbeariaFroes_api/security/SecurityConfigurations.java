@@ -18,8 +18,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
@@ -36,6 +34,7 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/api/login").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/clientes/buscar").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/clientes/buscar-com-agendamentos").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/clientes").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/barbeiros").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/barbeiros/**").permitAll();
@@ -45,7 +44,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     req.requestMatchers("/error").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/agendamentos/pendentes").authenticated();
-                    req.requestMatchers(HttpMethod.PUT, "/agendamentos/**").authenticated();
+                    req.requestMatchers(HttpMethod.PUT, "/agendamentos/**").permitAll();
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

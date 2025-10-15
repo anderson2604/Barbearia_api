@@ -2,6 +2,7 @@ package br.com.barbeariaFroes.barbeariaFroes_api.controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,30 +56,34 @@ public class BarbeiroController {
         List<Horario> horarios = horarioRepository.findByBarbeiroIdOrderByDataAscHoraAsc(id);
         return ResponseEntity.ok(horarios);
     }
-    
+
     @PostMapping("/{id}/horario")
-    public ResponseEntity<String> criarHorario(@RequestBody @Valid DadosHorarioDTO dados){
-		var barbeiro = barbeiroRepository.findById(dados.getIdBarbeiro()).orElse(null);
-		if(barbeiro == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Barbeiro não encontrado.");
-		}
-		
-		var horario = new Horario();
-		horario.setBarbeiro(barbeiro);
-		horario.setData(dados.getData());
-		horario.setHora(dados.getHora());
-		horario.setDisponivel(true);
-		
-		horarioRepository.save(horario);
-		
-		return new ResponseEntity<>("Horário criado com sucesso!", HttpStatus.CREATED);
-	}
-    
+    public ResponseEntity<String> criarHorario(@PathVariable Long id, @RequestBody @Valid DadosHorarioDTO dados) {
+        if (!id.equals(dados.getIdBarbeiro())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID do barbeiro na URL não corresponde ao ID no corpo da requisição.");
+        }
+        var barbeiro = barbeiroRepository.findById(dados.getIdBarbeiro()).orElse(null);
+        if (barbeiro == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Barbeiro não encontrado.");
+        }
+        var horario = new Horario();
+        horario.setBarbeiro(barbeiro);
+        horario.setData(dados.getData());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String horaFormatted = dados.getHora().format(formatter);
+        horario.setHora(horaFormatted);
+        horario.setDisponivel(true);
+        horarioRepository.save(horario);
+        return new ResponseEntity<>("Horário criado com sucesso!", HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}/horarios")
-    public ResponseEntity<List<Horario>> getHorariosByBarbeiro(@PathVariable Long id) {
-    	LocalDate dataAtual = LocalDate.now();
-        LocalTime horaAtual = LocalTime.now();
-        List<Horario> horarios = horarioRepository.findByBarbeiroIdAndDataHoraGreaterThanEqual(id, dataAtual, horaAtual);
+    public ResponseEntity<List<Horario>> listarHorariosPorBarbeiro(@PathVariable Long id) {
+        System.out.println("Buscando horários para barbeiro ID: " + id);
+        LocalDate currentDate = LocalDate.now();
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        List<Horario> horarios = horarioRepository.findByBarbeiroIdAndDisponivelAndDataHoraAfterNow(id, true, currentDate, currentTime);
+        System.out.println("Horários encontrados: " + horarios);
         return ResponseEntity.ok(horarios);
     }
 }

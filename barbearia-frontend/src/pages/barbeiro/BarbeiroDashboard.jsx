@@ -496,6 +496,12 @@ const BarbeiroDashboard = () => {
                     >
                       Confirmar Realizado
                     </button>
+                    <button
+                      onClick={() => handleGerenciarAgendamento(selectedAgendamento.id, 'CANCELADO_PELO_BARBEIRO')}
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-1 text-sm sm:text-base"
+                    >
+                      Rejeitar
+                    </button>
                   </div>
                 )}
                 {modalType === 'pendentes' && (

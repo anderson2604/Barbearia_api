@@ -21,6 +21,8 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
 
     List<Horario> findByBarbeiroIdAndDisponivelTrue(Long barbeiroId);
     
+    List<Horario> findByBarbeiroIdAndDisponivel(Long barbeiroId, boolean disponivel);
+    
     // Método para buscar horários disponíveis a partir de hoje
     @Query("SELECT h FROM Horario h LEFT JOIN Agendamento a ON a.barbeiro.id = h.barbeiro.id " +
     	       "AND a.dataHora = CAST((h.data || ' ' || h.hora) AS TIMESTAMP) " +
@@ -33,4 +35,17 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
     	    @Param("dataAtual") LocalDate dataAtual,
     	    @Param("horaAtual") LocalTime horaAtual
     	);
+    
+    @Query("SELECT h FROM Horario h " +
+            "WHERE h.barbeiro.id = :barbeiroId " +
+            "AND h.disponivel = :disponivel " +
+            "AND (h.data > :currentDate " +
+            "OR (h.data = :currentDate AND h.hora >= :currentTime))" + 
+            "ORDER BY h.data ASC, h.hora ASC")
+     List<Horario> findByBarbeiroIdAndDisponivelAndDataHoraAfterNow(
+             @Param("barbeiroId") Long barbeiroId,
+             @Param("disponivel") boolean disponivel,
+             @Param("currentDate") LocalDate currentDate,
+             @Param("currentTime") String currentTime);
+ 
 }

@@ -19,14 +19,13 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
             try {
                 setLoading(true);
                 setHorarios({});
-                //console.log(`Buscando horários para barbeiro ID: ${barbeiro.id}`);
+                console.log(`Buscando horários para barbeiro ID: ${barbeiro.id}`);
                 const response = await axios.get(`http://localhost:8080/barbeiros/${barbeiro.id}/horarios`);
-                console.log('Horários recebidos:', response.data);
+//                console.log('Horários recebidos:', JSON.stringify(response.data, null, 2));
                 // Transformar o array de objetos em um objeto agrupado por data
                 const horariosPorData = response.data.reduce((acc, horario) => {
                     const data = horario.data;
-                    // Normalizar hora para "HH:mm"
-                    const hora = horario.hora.split(':').slice(0, 2).join(':');
+                    const hora = horario.hora; // Formato "HH:mm:ss"
                     if (!acc[data]) {
                         acc[data] = [];
                     }
@@ -59,10 +58,14 @@ const ServicoDataHoraPicker = ({ barbeiro, cliente, onAgendamentoSuccess }) => {
             return;
         }
 
+        // Validar se o horário selecionado está na lista de horários disponíveis
+        if (!horarios[dataSelecionada]?.includes(horarioSelecionado)) {
+            setError('O horário selecionado não está disponível. Escolha outro horário.');
+            return;
+        }
+
         try {
-            // Formatar dataHora como "yyyy-MM-ddTHH:mm:ss"
-            const [hours, minutes] = horarioSelecionado.split(':');
-            const dataHora = `${dataSelecionada}T${hours}:${minutes}:00`;
+            const dataHora = `${dataSelecionada}T${horarioSelecionado}`; // Ex.: "2025-10-09T17:00:00"
             const agendamento = {
                 idBarbeiro: barbeiro.id,
                 idServico: servicoSelecionado.id,

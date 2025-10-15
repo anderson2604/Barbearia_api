@@ -3,6 +3,7 @@ package br.com.barbeariaFroes.barbeariaFroes_api.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,7 @@ public class AgendamentoController {
                     agendamento.setStatus(StatusAgendamento.CONFIRMADO);
                     return ResponseEntity.ok(repository.save(agendamento));
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
     }
 
     @PutMapping("/{id}/cancelar")
@@ -91,8 +92,11 @@ public class AgendamentoController {
     public ResponseEntity<Agendamento> cancelar(@PathVariable Long id) {
         return repository.findById(id)
                 .map(agendamento -> {
-                    agendamento.setStatus(StatusAgendamento.CANCELADO_PELO_BARBEIRO);
-                    // Reabrir o horário associado
+    /*                LocalDateTime agora = LocalDateTime.now();
+                    if (agendamento.getDataHora().isBefore(agora)) {
+                        throw new IllegalArgumentException("Não é possível cancelar um agendamento passado.");
+                    } */
+                    agendamento.setStatus(StatusAgendamento.CANCELADO_PELO_CLIENTE);
                     Horario horario = agendamento.getHorario();
                     if (horario != null) {
                         horario.setDisponivel(true);
@@ -100,7 +104,7 @@ public class AgendamentoController {
                     }
                     return ResponseEntity.ok(repository.save(agendamento));
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
     }
 
     @PutMapping("/{id}/realizado")
@@ -111,22 +115,18 @@ public class AgendamentoController {
                     agendamento.setStatus(StatusAgendamento.REALIZADO);
                     return ResponseEntity.ok(repository.save(agendamento));
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
     }
 
     @PostMapping
     @Transactional
     public ResponseEntity<String> agendar(@RequestBody @Valid DadosAgendamentoClienteDTO dados) {
         try {
-            // Buscar barbeiro
+            System.out.println("Recebida requisição para /agendamentos com payload: " + dados);
             var barbeiro = barbeiroRepository.findById(dados.idBarbeiro())
                 .orElseThrow(() -> new IllegalArgumentException("Barbeiro não encontrado."));
-
-            // Buscar serviço
             var servico = servicoRepository.findById(dados.idServico())
                 .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado."));
-
-            // Buscar ou criar cliente
             Cliente cliente = clienteRepository.findByTelefone(dados.telefoneCliente())
                 .orElseGet(() -> {
                     var novoCliente = new Cliente();
@@ -134,28 +134,29 @@ public class AgendamentoController {
                     novoCliente.setTelefone(dados.telefoneCliente());
                     return clienteRepository.save(novoCliente);
                 });
-
-            // Parsear dataHora
             LocalDateTime dataHora = dados.dataHora();
             LocalDate data = dataHora.toLocalDate();
             LocalTime hora = dataHora.toLocalTime();
-
-            // Buscar horário correspondente
             List<Horario> horarios = horarioRepository.findByBarbeiroIdAndData(dados.idBarbeiro(), data);
+            System.out.println("Horários encontrados para barbeiro " + dados.idBarbeiro() + " e data " + data + ": " + horarios);
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String horaFormatted = hora.format(formatter);
+            System.out.println("Hora formatada para busca: " + horaFormatted);
+            
+            // Log para verificar valores exatos de h.getHora()
+            horarios.forEach(h -> System.out.println("Horário no banco: ID=" + h.getId() + ", Hora=" + h.getHora() + ", Disponível=" + h.isDisponivel()));
+            
             Horario horario = horarios.stream()
-                .filter(h -> h.getHora().equals(hora) && h.isDisponivel())
+                .filter(h -> {
+                    boolean match = h.getHora().trim().equals(horaFormatted) && h.isDisponivel();
+                    System.out.println("Verificando horário: ID=" + h.getId() + ", Hora=" + h.getHora() + ", Trimmed=" + h.getHora().trim() + ", Disponível=" + h.isDisponivel() + ", Corresponde=" + match);
+                    return match;
+                })
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Horário não disponível."));
-
-            // Converter status de String para StatusAgendamento
-            StatusAgendamento status;
-            try {
-                status = StatusAgendamento.valueOf(dados.status());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Status inválido: " + dados.status());
-            }
-
-            // Criar agendamento
+            
+            StatusAgendamento status = StatusAgendamento.valueOf(dados.status());
             var agendamento = new Agendamento();
             agendamento.setHorario(horario);
             agendamento.setBarbeiro(barbeiro);
@@ -163,21 +164,14 @@ public class AgendamentoController {
             agendamento.setCliente(cliente);
             agendamento.setDataHora(dataHora);
             agendamento.setStatus(status);
-
-            // Marcar horário como não disponível
             horario.setDisponivel(false);
             horarioRepository.save(horario);
-
-            // Salvar agendamento
             repository.save(agendamento);
-
-            System.out.println("Agendamento criado: barbeiro=" + barbeiro.getId() + ", dataHora=" + dataHora + ", horarioId=" + horario.getId());
-
+            System.out.println("Agendamento criado: " + agendamento);
             return new ResponseEntity<>("Agendamento criado com sucesso! Aguarde a confirmação.", HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao agendar: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao criar agendamento: " + e.getMessage());
         }
     }
 }
