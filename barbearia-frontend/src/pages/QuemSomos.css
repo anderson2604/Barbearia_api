@@ -1,0 +1,140 @@
+.quemsomos-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  height: 40vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+              url('https://images.unsplash.com/photo-1592647420600-4f2b2c7a1a3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.hero-overlay h1 {
+  font-size: 2.8rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.hero-overlay p {
+  font-size: 1.3rem;
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+/* Conteúdo Principal */
+.content-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.text-content {
+  flex: 2;
+  min-width: 300px;
+  color: rgb(198, 189, 176);
+}
+
+.text-content h2 {
+  color: #28a745;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.text-content h3 {
+  color: rgb(198, 189, 176);
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.text-content p {
+  margin-bottom: 18px;
+  font-size: 1.1rem;
+  text-align: justify;
+}
+
+/* Card de Contato */
+.contact-card {
+  flex: 1;
+  min-width: 280px;
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #28a745;
+}
+
+.contact-card h3 {
+  color: #28a745;
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+  font-size: 1rem;
+}
+
+.info-item .icon {
+  color: #28a745;
+  margin-right: 12px;
+  font-size: 1.2rem;
+}
+
+.info-item a {
+  color: #28a745;
+  text-decoration: none;
+}
+
+.info-item a:hover {
+  text-decoration: underline;
+}
+
+.btn-agendar {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-agendar:hover {
+  background-color: #218838;
+}
+
+.btn-agendar a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .content-section {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .hero-overlay h1 {
+    font-size: 2.2rem;
+  }
+}

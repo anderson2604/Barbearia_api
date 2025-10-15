@@ -9,8 +9,8 @@ const HeaderNav = () => {
       
       <div className="nav-links-right">
         <Link to="/" className="nav-link">Home</Link>
-        <Link to="/onde-fica" className="nav-link">Onde Fica</Link>
         <Link to="/quem-somos" className="nav-link">Quem Somos</Link>
+        <Link to="/onde-fica" className="nav-link">Onde Fica</Link>
       </div>
     </nav>
   );
