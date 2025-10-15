@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import ClienteLogin from '../components/cliente/ClienteLogin';
-import ClienteCadastroModal from '../components/cliente/ClienteCadastroModal';
 import BarbeirosList from '../components/barbeiro/BarbeirosList';
 import ServicoDataHoraPicker from '../components/agendamento/ServicoDataHoraPicker';
 import './AgendarPage.css';
 
 const AgendarPage = () => {
-    // 0: Login, 1: Cadastro, 2: Escolha do Barbeiro, 3: Escolha do Serviço/Data
     const [step, setStep] = useState(0);
     const [cliente, setCliente] = useState(null);
     const [barbeiroSelecionado, setBarbeiroSelecionado] = useState(null);
@@ -20,18 +18,12 @@ const AgendarPage = () => {
         setStep(1); // Abre o modal de cadastro
     };
 
-    const handleCadastroSuccess = (novoCliente) => {
-        setCliente(novoCliente);
-        setStep(2); // Vai para a escolha do barbeiro
-    };
-
     const handleBarbeiroSelected = (barbeiroData) => {
         setBarbeiroSelecionado(barbeiroData);
         setStep(3);
     };
 
     const handleAgendamentoSuccess = () => {
-        // alert('Seu agendamento foi realizado com sucesso!');
         window.location.href = '/';
     };
 
@@ -47,7 +39,7 @@ const AgendarPage = () => {
             case 1:
                 return (
                     <ClienteCadastroModal
-                        onCadastroSuccess={handleCadastroSuccess}
+                        onCadastroSuccess={handleLoginSuccess}
                     />
                 );
             case 2:

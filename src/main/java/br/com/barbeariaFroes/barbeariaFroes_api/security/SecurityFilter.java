@@ -38,7 +38,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             path.startsWith("/barbeiros") ||
             path.startsWith("/servicos") ||
             path.startsWith("/error") ||
-            (path.startsWith("/agendamentos") && method.equals("POST"))){
+            (path.startsWith("/agendamentos") && (method.equals("POST") || method.equals("PUT")))){
             filterChain.doFilter(request, response);
             return;
         }

@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import ClienteCadastroModal from './ClienteCadastroModal';
+import GerenciarAgendamentoModal from './GerenciarAgendamentoModal';
 import './ClienteLogin.css';
-import ClienteCadastroModal from './ClienteCadastroModal'; // Importe o novo modal
 
 const ClienteLogin = ({ onLoginSuccess }) => {
     const [telefone, setTelefone] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [showModal, setShowModal] = useState(false); // Estado para controlar a visibilidade do modal
+    const [showCadastroModal, setShowCadastroModal] = useState(false);
+    const [showAgendamentoModal, setShowAgendamentoModal] = useState(false);
+    const [showCancelSuccessModal, setShowCancelSuccessModal] = useState(false); // Novo estado
+    const [cancelamentoData, setCancelamentoData] = useState(null); // Dados do cancelamento
+    const [cliente, setCliente] = useState(null);
+    const [agendamentosAtivos, setAgendamentosAtivos] = useState([]);
 
     const handleTelefoneChange = (e) => {
         let value = e.target.value;
@@ -40,28 +46,58 @@ const ClienteLogin = ({ onLoginSuccess }) => {
         }
 
         try {
-            // Requisição para a nova rota de busca
-            const response = await axios.post('http://localhost:8080/clientes/buscar', { telefone });
-            
-            // Se o cliente for encontrado, avança para a próxima etapa
-            onLoginSuccess(response.data);
+            const telefoneLimpo = telefone.replace(/\D/g, "");
+            console.log('Telefone enviado:', telefoneLimpo);
 
+            const response = await axios.post('http://localhost:8080/clientes/buscar-com-agendamentos', { telefone: telefoneLimpo });
+            console.log('Resposta do buscar-com-agendamentos:', response.data);
+
+            if (response.data) {
+                setCliente({
+                    id: response.data.id,
+                    nome: response.data.nome,
+                    telefone: response.data.telefone
+                });
+
+                if (response.data.temAgendamentoAtivo) {
+                    setAgendamentosAtivos(response.data.agendamentosAtivos || []);
+                    setShowAgendamentoModal(true);
+                } else {
+                    onLoginSuccess(response.data);
+                }
+            }
         } catch (err) {
             setLoading(false);
-            // Se a resposta for 404 (cliente não encontrado), abre o modal de cadastro
             if (err.response && err.response.status === 404) {
-                setShowModal(true);
+                setShowCadastroModal(true);
             } else {
-                console.error('Erro ao buscar cliente:', err);
+                console.error('Erro ao buscar cliente:', err.response?.data || err.message);
                 setError('Ocorreu um erro. Tente novamente.');
             }
         }
     };
-    
-    // Callback para quando o modal de cadastro for concluído
+
     const handleCadastroSuccess = (clienteData) => {
-        setShowModal(false);
+        setShowCadastroModal(false);
         onLoginSuccess(clienteData);
+    };
+
+    const handleManterAgendamento = () => {
+        setShowAgendamentoModal(false);
+        window.location.href = '/';
+    };
+
+    // Alterado: Agora recebe os dados do cancelamento do modal filho
+    const handleCancelarAgendamento = (agendamentoId, dadosCancelamento) => {
+        setShowAgendamentoModal(false);
+        setAgendamentosAtivos([]);
+        setCancelamentoData(dadosCancelamento); // Armazena dados
+        setShowCancelSuccessModal(true); // Mostra modal de sucesso
+    };
+
+    const handleSuccessClose = () => {
+        setShowCancelSuccessModal(false);
+        window.location.href = '/'; // Volta para home
     };
 
     return (
@@ -71,7 +107,7 @@ const ClienteLogin = ({ onLoginSuccess }) => {
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Digite seu telefone"
+                    placeholder="Digite seu telefone (ex.: (11) 99999-9999)"
                     value={telefone}
                     onChange={handleTelefoneChange}
                     maxLength="15"
@@ -82,13 +118,39 @@ const ClienteLogin = ({ onLoginSuccess }) => {
                 {error && <p className="error-message">{error}</p>}
             </form>
 
-            {/* Renderiza o modal se o showModal for verdadeiro */}
-            {showModal && (
+            {showCadastroModal && (
                 <ClienteCadastroModal
-                    telefone={telefone}
+                    telefone={telefone.replace(/\D/g, "")}
                     onCadastroSuccess={handleCadastroSuccess}
-                    onClose={() => setShowModal(false)}
+                    onClose={() => setShowCadastroModal(false)}
                 />
+            )}
+
+            {showAgendamentoModal && (
+                <GerenciarAgendamentoModal
+                    cliente={cliente}
+                    agendamentos={agendamentosAtivos}
+                    onManterAgendamento={handleManterAgendamento}
+                    onCancelarAgendamento={handleCancelarAgendamento} // Passa função que recebe dados
+                    onClose={() => setShowAgendamentoModal(false)}
+                />
+            )}
+
+            {/* Modal de Sucesso de Cancelamento */}
+            {showCancelSuccessModal && cancelamentoData && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>Agendamento Cancelado com Sucesso!</h2>
+                        <p><strong>Barbeiro:</strong> {cancelamentoData.barbeiro.nome}</p>
+                        <p><strong>Cliente:</strong> {cancelamentoData.cliente.nome} ({cancelamentoData.cliente.telefone})</p>
+                        <p><strong>Serviço:</strong> {cancelamentoData.servico.nome} (R$ {cancelamentoData.servico.preco})</p>
+                        <p><strong>Data/Hora:</strong> {new Date(cancelamentoData.dataHora).toLocaleString('pt-BR')}</p>
+                        <p><strong>Status:</strong> {cancelamentoData.status}</p>
+                        <button onClick={handleSuccessClose} className="btn-ok">
+                            OK
+                        </button>
+                    </div>
+                </div>
             )}
         </div>
     );
