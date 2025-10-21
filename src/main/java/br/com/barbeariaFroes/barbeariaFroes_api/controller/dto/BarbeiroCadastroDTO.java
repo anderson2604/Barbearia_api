@@ -14,5 +14,5 @@ public record BarbeiroCadastroDTO(
 
     @NotBlank
     @Size(min = 6)
-    String senha
+    String pasword
 ) {}

@@ -36,15 +36,15 @@ public class Barbeiro implements UserDetails {
     @Column(unique = true)
     private String email;
 
-    private String senha;
+    private String password;
     
     private String login;
 
     // Construtor para o cadastro de um novo barbeiro
-    public Barbeiro(String nome, String email, String senha) {
+    public Barbeiro(String nome, String email, String password) {
         this.nome = nome;
         this.email = email;
-        this.senha = senha;
+        this.password = password;
     }
 
     @Override
@@ -54,12 +54,12 @@ public class Barbeiro implements UserDetails {
 
     @Override
     public String getPassword() {
-        return senha;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return login;
     }
 
     @Override

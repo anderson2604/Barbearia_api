@@ -3,6 +3,7 @@ package br.com.barbeariaFroes.barbeariaFroes_api.repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,8 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
     List<Horario> findByBarbeiroIdAndDisponivelTrue(Long barbeiroId);
     
     List<Horario> findByBarbeiroIdAndDisponivel(Long barbeiroId, boolean disponivel);
+    
+    Optional<Horario> findByBarbeiroIdAndDataAndHora(Long barbeiroId, LocalDate data, String hora);
     
     // Método para buscar horários disponíveis a partir de hoje
     @Query("SELECT h FROM Horario h LEFT JOIN Agendamento a ON a.barbeiro.id = h.barbeiro.id " +

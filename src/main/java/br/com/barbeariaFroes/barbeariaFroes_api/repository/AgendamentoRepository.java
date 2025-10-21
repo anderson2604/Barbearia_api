@@ -14,13 +14,13 @@ import br.com.barbeariaFroes.barbeariaFroes_api.model.StatusAgendamento;
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
 
     // Busca agendamentos pendentes por ID do barbeiro
-    List<Agendamento> findByBarbeiroIdAndStatus(Long barbeiroId, StatusAgendamento status);
+    List<Agendamento> findByStatus(StatusAgendamento status);
 
     // Busca agendamentos confirmados atrasados entre dataHoraZero e dataHora
-    @Query("SELECT a FROM Agendamento a WHERE a.barbeiro.id = :barbeiroId AND a.status = :status "
+    @Query("SELECT a FROM Agendamento a WHERE a.status = :status "
     		+ "AND a.dataHora >= :dataHoraZero AND a.dataHora < :dataHora")
-    List<Agendamento> findByBarbeiroIdAndStatusAndDataHoraBetween(
-    		@Param("barbeiroId") Long barbeiroId,
+    List<Agendamento> findByStatusAndDataHoraBetween(
+    	//	@Param("barbeiroId") Long barbeiroId,
     		@Param("status") StatusAgendamento status,
     		@Param("dataHoraZero") LocalDateTime dataHoraZero,
     		@Param("dataHora") LocalDateTime dataHora
