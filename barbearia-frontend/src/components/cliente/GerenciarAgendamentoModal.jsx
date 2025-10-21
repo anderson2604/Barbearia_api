@@ -34,12 +34,6 @@ const GerenciarAgendamentoModal = ({ cliente, agendamentos, onManterAgendamento,
                         <p><strong>Serviço:</strong> {agendamento.servico.nome}</p>
                         <p><strong>Data/Hora:</strong> {new Date(agendamento.dataHora).toLocaleString('pt-BR')}</p>
                         <p><strong>Status:</strong> <span className={getStatusClass(agendamento.status)}>{agendamento.status}</span></p>
-                        <button
-                            onClick={() => handleCancelar(agendamento.id)}
-                            className="btn-cancelar"
-                        >
-                            Cancelar Agendamento
-                        </button>
                     </div>
                 ))}
                 <div className="modal-actions">
@@ -47,6 +41,12 @@ const GerenciarAgendamentoModal = ({ cliente, agendamentos, onManterAgendamento,
                         Manter Agendamento
                     </button>
                 </div>
+                <div className="modal-actions">
+                    <button onClick={() => handleCancelar(agendamento.id)} className="btn-cancelar">
+                        Cancelar Agendamento
+                    </button>
+                </div>
+
             </div>
         </div>
     );

@@ -17,7 +17,7 @@ const BarbeiroDashboard = () => {
   const [modalHorariosOpen, setModalHorariosOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [novoBarbeiro, setNovoBarbeiro] = useState({ nome: '', email: '', senha: '' });
+  const [novoBarbeiro, setNovoBarbeiro] = useState({ nome: '', email: '', pasword: '' });
   const [novoHorario, setNovoHorario] = useState({ barbeiroId: '', data: '', hora: '' });
   const [editingBarbeiro, setEditingBarbeiro] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -110,7 +110,7 @@ const BarbeiroDashboard = () => {
       await api.post('/barbeiros/cadastrar', novoBarbeiro);
       const response = await api.get('/barbeiros');
       setBarbeiros(response.data);
-      setNovoBarbeiro({ nome: '', email: '', senha: '' });
+      setNovoBarbeiro({ nome: '', email: '', pasword: '' });
       setError(null);
     } catch (err) {
       setError('Erro ao cadastrar barbeiro.');
@@ -120,18 +120,30 @@ const BarbeiroDashboard = () => {
 
   // Função para editar barbeiro
   const handleEditarBarbeiro = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // evita reload da página
+    if (!editingBarbeiro) return;
+
+    const dados = {
+        email: editingBarbeiro.email,
+        novaSenha: editingBarbeiro.pasword  
+    };
+    if (!dados.novaSenha) delete dados.novaSenha;
+
     try {
-      await api.put(`/barbeiros/${editingBarbeiro.id}`, editingBarbeiro);
-      const response = await api.get('/barbeiros');
-      setBarbeiros(response.data);
-      setEditingBarbeiro(null);
-      setError(null);
+        const response = await api.put(`/barbeiros/${editingBarbeiro.id}`, dados);
+        //console.log('Response do update:', response.data);
+        const res = await api.get('/barbeiros');
+        setBarbeiros(res.data);
+
+        alert("Barbeiro alterado com sucesso!")
+
+        setEditingBarbeiro(null); // encerra modo edição
+        navigate('/barbeiro/login');
     } catch (err) {
-      setError('Erro ao editar barbeiro.');
-      console.error('Erro:', err);
+        console.error('Erro no update:', err.response?.data);
+        setError('Erro ao atualizar barbeiro.');
     }
-  };
+};
 
   // Função para carregar horários disponíveis de um barbeiro
   const fetchHorarios = async (barbeiroId) => {
@@ -173,8 +185,12 @@ const BarbeiroDashboard = () => {
       setNovoHorario({ ...novoHorario, data: novoHorario.data, hora: '' }); // Mantém barbeiroId, reseta data e hora
       setError(null);
     } catch (err) {
-      setError('Erro ao adicionar horário.');
-      console.error('Erro:', err);
+      if(err.response?.status === 409){
+        alert("Este horário já foi adicionado!");
+      }else{
+        setError('Erro ao adicionar horário.');
+        console.error('Erro:', err);
+      }
     }
   };
 
@@ -301,6 +317,7 @@ const BarbeiroDashboard = () => {
                         )}
                       </p>
                       <p><strong>Status:</strong> {agendamento.status}</p>
+                      <p><strong>Barbeiro:</strong> {agendamento.barbeiro.nome}</p>
                     </div>
                     <button
                       onClick={() => openModal(agendamento, 'pendentes')}
@@ -333,6 +350,7 @@ const BarbeiroDashboard = () => {
                         )}
                       </p>
                       <p><strong>Status:</strong> {agendamento.status}</p>
+                      <p><strong>Barbeiro:</strong> {agendamento.barbeiro.nome}</p>
                     </div>
                     <button
                       onClick={() => openModal(agendamento, 'confirmados')}
@@ -365,6 +383,7 @@ const BarbeiroDashboard = () => {
                         )}
                       </p>
                       <p><strong>Status:</strong> {agendamento.status}</p>
+                      <p><strong>Barbeiro:</strong> {agendamento.barbeiro.nome}</p>
                     </div>
                     <button
                       onClick={() => openModal(agendamento, 'atrasados')}
@@ -533,7 +552,7 @@ const BarbeiroDashboard = () => {
           {/* Aba de Barbeiros */}
           <TabPanel>
             <h3 className="text-xl font-semibold text-gray-700 mb-4 mt-6">Gerenciar Barbeiros</h3>
-            <form onSubmit={editingBarbeiro ? handleEditarBarbeiro : handleCadastrarBarbeiro} className="mb-6">
+            <form onSubmit={editingBarbeiro ? handleEditarBarbeiro : handleCadastrarBarbeiro} >
               <div className="grid gap-4 sm:grid-cols-2">
                 <input
                   type="text"
@@ -562,11 +581,11 @@ const BarbeiroDashboard = () => {
                 <input
                   type="password"
                   placeholder="Senha"
-                  value={editingBarbeiro ? editingBarbeiro.senha : novoBarbeiro.senha}
+                  value={editingBarbeiro ? editingBarbeiro.pasword : novoBarbeiro.pasword}
                   onChange={(e) =>
                     editingBarbeiro
-                      ? setEditingBarbeiro({ ...editingBarbeiro, senha: e.target.value })
-                      : setNovoBarbeiro({ ...novoBarbeiro, senha: e.target.value })
+                      ? setEditingBarbeiro({ ...editingBarbeiro, pasword: e.target.value })
+                      : setNovoBarbeiro({ ...novoBarbeiro, pasword: e.target.value })
                   }
                   className="border rounded p-2"
                   required

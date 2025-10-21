@@ -54,13 +54,13 @@ public class AgendamentoController {
 
     @GetMapping("/pendentes")
     public ResponseEntity<List<Agendamento>> listarPendentes(@AuthenticationPrincipal Barbeiro barbeiroLogado) {
-        var agendamentosPendentes = repository.findByBarbeiroIdAndStatus(barbeiroLogado.getId(), StatusAgendamento.PENDENTE);
+        var agendamentosPendentes = repository.findByStatus(StatusAgendamento.PENDENTE);
         return ResponseEntity.ok(agendamentosPendentes);
     }
     
     @GetMapping("/confirmados")
     public ResponseEntity<List<Agendamento>> listarConfirmados(@AuthenticationPrincipal Barbeiro barbeiroLogado) {
-        var agendamentosConfirmados = repository.findByBarbeiroIdAndStatus(barbeiroLogado.getId(), StatusAgendamento.CONFIRMADO);
+        var agendamentosConfirmados = repository.findByStatus(StatusAgendamento.CONFIRMADO);
         return ResponseEntity.ok(agendamentosConfirmados);
     }
     
@@ -68,8 +68,8 @@ public class AgendamentoController {
     public ResponseEntity<List<Agendamento>> listarAtrasados(@AuthenticationPrincipal Barbeiro barbeiroLogado) {
         LocalDateTime agora = LocalDateTime.now();
         LocalDateTime dataHoraZero = agora.toLocalDate().atStartOfDay();
-        var agendamentosAtrasados = repository.findByBarbeiroIdAndStatusAndDataHoraBetween(
-                barbeiroLogado.getId(), 
+        var agendamentosAtrasados = repository.findByStatusAndDataHoraBetween(
+         //       barbeiroLogado.getId(), 
                 StatusAgendamento.CONFIRMADO, 
                 dataHoraZero,
                 agora);
